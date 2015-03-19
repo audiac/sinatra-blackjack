@@ -1,1 +1,0 @@
-Blackjack built on Sinatra
