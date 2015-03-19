@@ -1,0 +1,28 @@
+<h1>Blackjack</h1>
+
+Welcome <%= session[:player_name] %>!
+
+<br />
+
+Dealer's cards:
+<ul>
+  <% session[:dealer_cards].each do |card| %>
+    <li><%= card.to_s %></li>
+  <% end %>
+</ul>
+
+<br />
+
+Player's cards:
+<ul>
+  <% session[:player_cards].each do |card| %>
+    <li><%= card.to_s %></li>
+  <% end %>
+</ul>
+
+<p>
+  <%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>
+</p>
+
+<input type="submit" value="Hit" action="/hit" method="post" />
+<input type="submit" value="Stay" action="/stay" method="post" />
