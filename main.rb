@@ -69,6 +69,10 @@ helpers do
     @show_hit_or_stay_buttons = false
     @success = "<strong>It's a tie! #{msg}</strong>"
   end
+
+  def reveal_dealer_card
+    session[:turn] = "dealer"
+  end
 end
 
 before do
@@ -110,6 +114,15 @@ get '/game' do
   session[:dealer_cards] << session[:deck].pop
   session[:player_cards] << session[:deck].pop
 
+  player_total = calculate_total(session[:player_cards])
+  dealer_total = calculate_total(session[:dealer_cards])
+  if dealer_total == BLACKJACK
+    reveal_dealer_card
+    loser!("Dealer hit blackjack.")
+  elsif player_total == BLACKJACK
+    winner!("#{session[:player_name]} hit blackjack!")
+  end
+
   erb :game
 end
 
@@ -118,9 +131,9 @@ post '/game/player/hit' do
 
   player_total = calculate_total(session[:player_cards])
   if player_total == BLACKJACK
-    winner!("#{session[:player_name]} hit blackjack.")
+    winner!("#{session[:player_name]} hit blackjack!")
   elsif player_total > BLACKJACK
-    loser!("#{session[:player_name]} busted.")
+    loser!("#{session[:player_name]} busted with #{player_total}.")
   end
   erb :game
 end
@@ -139,7 +152,7 @@ get '/game/dealer' do
     loser!("Dealer hit blackjack.")
   elsif dealer_total > BLACKJACK
     @success = "Dealer busted!"
-    winner!("Dealer busted with #{dealer_total}")
+    winner!("Dealer busted with #{dealer_total}.")
   elsif dealer_total >= DEALER_HIT_MIN
     redirect '/game/compare'
   else
