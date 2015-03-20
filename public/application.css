@@ -10,3 +10,11 @@
 .card_image {
   margin: 0 5px 5px 0;
 }
+
+.navbar .nav > li > a {
+  padding-left: 0;
+}
+
+#new-player-btn {
+  margin-left: 10px;
+}
