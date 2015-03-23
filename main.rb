@@ -7,6 +7,7 @@ use Rack::Session::Cookie, :key => 'rack.session',
 
 BLACKJACK = 21
 DEALER_HIT_MIN = 17
+INITIAL_POT_AMOUNT = 500
 
 
 helpers do
@@ -55,12 +56,14 @@ helpers do
   def winner!(msg)
     @play_again = true
     @show_hit_or_stay_buttons = false
+    session[:player_pot] += session[:player_bet]
     @success = "<strong>#{session[:player_name]} wins! #{msg}</strong>"
   end
 
   def loser!(msg)
     @play_again = true
     @show_hit_or_stay_buttons = false
+    session[:player_pot] -= session[:player_bet]
     @error = "<strong>#{session[:player_name]} loses. #{msg}</strong>"
   end
 
@@ -88,6 +91,7 @@ get '/' do
 end
 
 get '/new_player' do
+  session[:player_pot] = INITIAL_POT_AMOUNT
   erb :new_player
 end
 
@@ -96,8 +100,27 @@ post '/new_player' do
     @error = "Name is required"
     halt erb(:new_player)
   end
+
   session[:player_name] = params[:player_name]
-  redirect '/game'
+  redirect '/bet'
+end
+
+get '/bet' do
+  session[:player_bet] = nil
+  erb :bet
+end
+
+post '/bet' do
+  if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
+    @error = "Please make a bet."
+    halt erb(:bet)
+  elsif params[:bet_amount].to_i > session[:player_pot]
+    @error = "Bet amount cannot be greater than $#{session[:player_pot]}."
+    halt erb(:bet)
+  else
+    session[:player_bet] = params[:bet_amount].to_i
+    redirect '/game'
+  end
 end
 
 get '/game' do
@@ -135,7 +158,7 @@ post '/game/player/hit' do
   elsif player_total > BLACKJACK
     loser!("#{session[:player_name]} busted with #{player_total}.")
   end
-  erb :game
+  erb :game, layout: false
 end
 
 post '/game/player/stay' do
