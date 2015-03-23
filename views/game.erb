@@ -47,10 +47,10 @@
 
   <% if @show_hit_or_stay_buttons %>
     <p>What would <%= session[:player_name] %> like to do?</p>
-    <form id="hit_form" action="/game/player/hit" method="post" />
+    <form id="hit_form" action="/game/player/hit" method="post">
       <input type="submit" value="Hit" class="btn btn-success" />
     </form>
-    <form id="stay_form" action="/game/player/stay" method="post" />
+    <form id="stay_form" action="/game/player/stay" method="post">
       <input type="submit" value="Stay" class="btn btn-danger" />
     </form>
   <% end %>
